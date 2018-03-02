@@ -105,12 +105,12 @@ The most recent Vim(NeoVim) version is recommended, for space-vim has been speci
 #### one-line installer
 
 ```bash
-$ bash <(curl -fsSL https://raw.githubusercontent.com/liuchengxu/space-vim/master/install.sh)
+$ bash <(curl -fsSL https://raw.githubusercontent.com/lwllvyb/space-vim/master/install.sh)
 ```
 #### Makefile
 
 ```bash
-$ git clone https://github.com/liuchengxu/space-vim.git ~/.space-vim
+$ git clone https://github.com/lwllvyb/space-vim.git ~/.space-vim
 $ cd ~/.space-vim
 $ make vim     # install space-vim for Vim
 $ make neovim  # install space-vim for NeoVim

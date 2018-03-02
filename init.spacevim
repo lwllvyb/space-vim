@@ -25,8 +25,24 @@ let g:spacevim_layers = [
 function! UserInit()
 
   " Add plugin via Plug command.
-  Plug 'junegunn/seoul256.vim'
-
+	" Install personal plugins
+  Plug 'airblade/vim-rooter'
+  Plug 'tacahiroy/ctrlp-funky'
+  Plug 'scrooloose/nerdtree'
+  Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+  Plug 'rking/ag.vim'
+  Plug 'scrooloose/nerdcommenter'
+  Plug 'milkypostman/vim-togglelist'
+  Plug 'yssl/QFEnter'
+  Plug 'jistr/vim-nerdtree-tabs'
+  Plug 'Xuyuanp/nerdtree-git-plugin'
+  Plug 'airblade/vim-gitgutter'
+  Plug 'jiangmiao/auto-pairs'
+  Plug 'Lokaltog/vim-easymotion'
+  Plug 'flazz/vim-colorschemes'
+  Plug 'davidhalter/jedi-vim'
+  Plug 'vim-syntastic/syntastic'
+  Plug 'ervandew/supertab'
 endfunction
 
 " Override the default settings as well as adding extras
@@ -45,5 +61,129 @@ function! UserConfig()
       let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
     endif
   endif
+" vim-rooter
+  let g:rooter_patterns = ['.git/']
+  let g:rooter_resolve_links = 1
+  let g:rooter_silent_chdir = 0
+  
+  noremap <leader>ff :Files<cr>
+  """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+  " cscope setting
+  """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+  if has("cscope")
+    if has("unix")
+      set csprg=/usr/bin/cscope
+    endif
+    if has("macunix")
+      set csprg=/usr/local/bin/cscope
+    endif
 
+      set csto=1
+      set cst
+      set nocsverb
+      if has('quickfix')
+        set cscopequickfix=s-,c-,d-,i-,t-,e-,a-
+      endif
+      " add any database in current directory
+      if filereadable("cscope.out")
+          cs add cscope.out
+      endif
+      set csverb
+  endif
+
+  " nmap <leader>s :cs find s <C-R>=expand("<cword>")<CR><CR>
+  nmap <leader>fd :lcs find g <C-R>=expand("<cword>")<CR><CR>
+  nmap <leader>fr :cs find c <C-R>=expand("<cword>")<CR><CR>
+  " nmap <leader>t :cs find t <C-R>=expand("<cword>")<CR><CR>
+  " nmap <leader>e :cs find e <C-R>=expand("<cword>")<CR><CR>
+  " nmap <C-_>f :cs find f <C-R>=expand("<cfile>")<CR><CR>
+  " nmap <C-_>i :cs find i ^<C-R>=expand("<cfile>")<CR>$<CR>
+  " nmap <C-_>d :cs find d <C-R>=expand("<cword>")<CR><CR>
+
+  " auto update cscope databases
+  nmap <F2> :!find . -iname '*.c' -o -iname '*.cpp' -o -iname '*.cc' -o -iname '*.h' -o -iname '*.hpp' > cscope.files<CR>
+    \:!cscope -b -i cscope.files -f cscope.out<CR>
+    \:cs add cscope.out<CR>
+    \:cs reset<CR>
+
+  " nerdcommenter
+  " Add spaces after comment delimiters by default
+  let g:NERDSpaceDelims = 1
+  " Use compact syntax for prettified multi-line comments
+  let g:NERDCompactSexyComs = 1
+  " Align line-wise comment delimiters flush left instead of following code indentation
+  let g:NERDDefaultAlign = 'left'
+  " Set a language to use its alternate delimiters by default
+  let g:NERDAltDelims_java = 1
+  " Add your own custom formats or override the defaults
+  let g:NERDCustomDelimiters = { 'c': { 'left': '/**','right': '*/' } }
+  " Allow commenting and inverting empty lines (useful when commenting a region)
+  let g:NERDCommentEmptyLines = 1
+  " Enable trimming of trailing whitespace when uncommenting
+  let g:NERDTrimTrailingWhitespace = 1
+ 
+  " open quickfix on the left of window
+  nmap <leader>eo :call ToggleQuickfixList()<CR>
+  nmap <leader>en :cnext<CR>
+  nmap <leader>ep :cprev<CR>
+
+  " jistr/vim-nerdtree-tabs
+   map <Leader>n :NERDTreeTabsToggle<CR>
+   " 显示行号
+  let NERDTreeShowLineNumbers=1
+  let NERDTreeAutoCenter=1
+  " 是否显示隐藏文件
+  let NERDTreeShowHidden=1
+  " 设置宽度
+  let NERDTreeWinSize=31
+  " 在终端启动vim时，共享NERDTree
+  let g:nerdtree_tabs_open_on_gui_startup=0
+  let g:nerdtree_tabs_open_on_console_startup=0
+  " 忽略一下文件的显示
+  let NERDTreeIgnore=['\.pyc','\~$','\.swp']
+  " 显示书签列表
+  let NERDTreeShowBookmarks=1
+
+  let g:NERDTreeIndicatorMapCustom = {
+    \ "Modified"  : "✹",
+    \ "Staged"    : "✚",
+    \ "Untracked" : "✭",
+    \ "Renamed"   : "➜",
+    \ "Unmerged"  : "═",
+    \ "Deleted"   : "✖",
+    \ "Dirty"     : "✗",
+    \ "Clean"     : "✔︎",
+    \ 'Ignored'   : '☒',
+    \ "Unknown"   : "?"
+    \ }
+  " ------------------------------- basic start ------------------------------
+
+  set tabstop=4
+  set softtabstop=0 noexpandtab
+  set shiftwidth=4
+
+  " tab 切换为 space
+  " set tabstop=8 softtabstop=0 expandtab shiftwidth=4 smarttab
+  " ------------------------------- basic  end ------------------------------
+
+
+  " 配置状态栏 airline
+  if !exists('g:airline_symbols')
+      let g:airline_symbols = {}
+  endif
+  let g:airline_left_sep = '▶'
+  let g:airline_left_alt_sep = '❯'
+  let g:airline_right_sep = '◀'
+  let g:airline_right_alt_sep = '❮'
+  let g:airline_symbols.linenr = '¶'
+  let g:airline_symbols.branch = '⎇'
+
+  " 是否打开tabline
+  " let g:airline#extensions#tabline#enabled = 1
+
+  " 配置主题 colorscheme
+  colorscheme molokai
+
+  " 快速跳转 easymotion
+  " <leader> <leader> w 触发
 endfunction
