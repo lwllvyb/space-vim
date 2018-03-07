@@ -13,7 +13,7 @@ let g:spacevim_plug_home = '~/.vim/plugged'
 " Enable the existing layers in space-vim
 let g:spacevim_layers = [
       \ 'fzf', 'unite', 'better-defaults',
-      \ 'which-key',
+      \ 'which-key', 'airline',
       \ ]
 
 " If you want to have more control over the layer, try using Layer command.
@@ -182,8 +182,14 @@ function! UserConfig()
   " let g:airline#extensions#tabline#enabled = 1
 
   " 配置主题 colorscheme
-  colorscheme molokai
+  " colorscheme molokai
 
   " 快速跳转 easymotion
   " <leader> <leader> w 触发
+	" vim-header
+	let g:header_field_author = 'liwenlong'
+	let g:header_field_author_email = 'liwenlong03@meituan.com'
+	let g:header_field_modified_timestamp = 0
+	let g:header_field_modified_by = 0
+	map <F4> :AddHeader<CR>	
 endfunction
