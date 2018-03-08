@@ -43,6 +43,7 @@ function! UserInit()
   Plug 'davidhalter/jedi-vim'
   Plug 'vim-syntastic/syntastic'
   Plug 'ervandew/supertab'
+	Plug 'sbdchd/neoformat'
 endfunction
 
 " Override the default settings as well as adding extras
@@ -192,4 +193,22 @@ function! UserConfig()
 	let g:header_field_modified_timestamp = 0
 	let g:header_field_modified_by = 0
 	map <F4> :AddHeader<CR>	
+	" sbdchd/neoformat
+  let g:neoformat_enabled_python = ['yapf']
+  " 默认情况下
+  " Enable alignment
+  let g:neoformat_basic_format_align = 1
+  " Enable tab to spaces conversion
+  let g:neoformat_basic_format_retab = 0
+  " Enable trimmming of trailing whitespace
+  let g:neoformat_basic_format_trim = 1
+  " Run all enabled formatters (by default Neoformat stops after the first formatter succeeds)
+  let g:neoformat_run_all_formatters = 1
+  " When debugging, you can enable either of following variables for extra logging.
+  let g:neoformat_only_msg_on_error = 1
+  " run a formatter on save
+  augroup fmt
+    autocmd!
+    autocmd BufWritePre * undojoin | Neoformat
+  augroup END
 endfunction
