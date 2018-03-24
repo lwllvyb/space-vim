@@ -1,3 +1,6 @@
+" File  : /Users/liwenlong/.spacevim
+" Author: liwenlong <liwenlong03@meituan.com>
+" Date  : 03/15/2018
 " Let Vim and NeoVim shares the same plugin directory.
 " Comment it out if you don't like
 let g:spacevim_plug_home = '~/.vim/plugged'
@@ -42,9 +45,14 @@ function! UserInit()
 	Plug 'flazz/vim-colorschemes'
 	Plug 'lwllvyb/vim-header'
 	Plug 'davidhalter/jedi-vim'
-	Plug 'vim-syntastic/syntastic'
+	Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+	Plug 'w0rp/ale'
 	Plug 'ervandew/supertab'
 	Plug 'sbdchd/neoformat'
+	Plug 'devjoe/vim-codequery'
+	Plug 'Yggdroot/LeaderF'
+	Plug 'jremmen/vim-ripgrep'
+	Plug 'skywind3000/asyncrun.vim'
 endfunction
 
 " Override the default settings as well as adding extras
@@ -124,10 +132,13 @@ function! UserConfig()
 	" Enable trimming of trailing whitespace when uncommenting
 	let g:NERDTrimTrailingWhitespace = 1
 
-	" open quickfix on the left of window
+	" open quickfix on the left of window {
 	nmap <leader>eo :call ToggleQuickfixList()<CR>
 	nmap <leader>en :cnext<CR>
 	nmap <leader>ep :cprev<CR>
+	" open the error line num
+	nmap <leader>em :cc
+	"} open quickfix on the left of window
 
 	" jistr/vim-nerdtree-tabs
 	map <Leader>n :NERDTreeTabsToggle<CR>
@@ -189,18 +200,21 @@ function! UserConfig()
 	" 快速跳转 easymotion
 	" <leader> <leader> w 触发
 	" vim-header
+	let g:header_auto_add_header = 0
 	let g:header_field_author = 'liwenlong'
 	let g:header_field_author_email = 'liwenlong03@meituan.com'
 	let g:header_field_modified_timestamp = 0
 	let g:header_field_modified_by = 0
-	map <F4> :AddHeader<CR>
+	let g:header_field_timestamp_format = '%m/%d/%Y'
+	map <leader>ah :AddHeader<CR>
+
 	" sbdchd/neoformat
-	let g:neoformat_enabled_python = ['yapf']
+	let g:neoformat_enabled_python = ['pep8','yapf']
 	" 默认情况下
 	" Enable alignment
 	let g:neoformat_basic_format_align = 1
 	" Enable tab to spaces conversion
-	let g:neoformat_basic_format_retab = 0
+	let g:neoformat_basic_format_retab = 1
 	" Enable trimmming of trailing whitespace
 	let g:neoformat_basic_format_trim = 1
 	" Run all enabled formatters (by default Neoformat stops after the first formatter succeeds)
@@ -212,4 +226,34 @@ function! UserConfig()
 		autocmd!
 		autocmd BufWritePre * undojoin | Neoformat
 	augroup END
+
+
+	" jedi-vim
+	let g:jedi#force_py_version = 3
+
+	" w0rp/ale
+	let g:ale_fixers = {
+				\"python":["yapf",],
+				\}
+	let g:ale_sign_error = 'E'
+	let g:ale_sign_warning = 'W'
+	" Set this. Airline will handle the rest.
+	let g:airline#extensions#ale#enabled = 1
+	" Write this in your vimrc file
+	let g:ale_set_loclist = 1
+	let g:ale_set_quickfix = 0
+	let g:ale_open_list = 0
+	let g:ale_keep_list_window_open = 0
+
+	" kywind3000/asyncrun.vim {
+	let g:asyncrun_open = 10
+	" }
+	" ripgrep -- asyncrun.vim {
+	" noremap <F3> :AsyncRun! rg --vimgrep --glob '*.{c,cpp,h}' --glob '!{contrib,build,CMakeFiles}' -w <cword> <cr>
+
+	noremap <leader>sc :AsyncRun! rg --vimgrep --glob '*.{c,cpp,h}' --glob '!{contrib,build,CMakeFiles}' -w <cword> <cr>
+	noremap <leader>sp :AsyncRun! rg --vimgrep --glob '*.{py}' --glob '!{contrib,build,CMakeFiles}' -w <cword> <cr>
+	noremap <leader>sg :AsyncRun! rg --vimgrep --glob '*.{go}' --glob '!{contrib,build,CMakeFiles}' -w <cword> <cr>
+	" }
+
 endfunction
