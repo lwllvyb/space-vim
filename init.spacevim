@@ -170,13 +170,20 @@ function! UserConfig()
 				\ "Unknown"   : "?"
 				\ }
 	" ------------------------------- basic start ------------------------------
-
-	set tabstop=4
-	set softtabstop=0 noexpandtab
-	set shiftwidth=4
-
-	" tab 切换为 space
-	" set tabstop=8 softtabstop=0 expandtab shiftwidth=4 smarttab
+	map <F8> : call SmartTab()<CR>
+	func! SmartTab()
+		echo &filetype
+		if &filetype == "python"
+			" tab 切换为 space
+			set tabstop=8 softtabstop=0 expandtab shiftwidth=4 smarttab
+		elseif &filetype == "cpp"
+			echo "no indent"
+		else
+			set tabstop=4
+			set softtabstop=0 noexpandtab
+			set shiftwidth=4
+		endif
+	endfunc
 	" ------------------------------- basic  end ------------------------------
 
 
@@ -222,11 +229,11 @@ function! UserConfig()
 	" When debugging, you can enable either of following variables for extra logging.
 	let g:neoformat_only_msg_on_error = 1
 	" run a formatter on save
-	augroup fmt
-		autocmd!
-		autocmd BufWritePre * undojoin | Neoformat
-	augroup END
-
+	" augroup fmt
+	"   autocmd!
+	"   autocmd BufWritePre * undojoin | Neoformat
+	" augroup END
+	"
 
 	" jedi-vim
 	let g:jedi#force_py_version = 3
