@@ -16,7 +16,7 @@ let g:spacevim_plug_home = '~/.vim/plugged'
 " Enable the existing layers in space-vim
 let g:spacevim_layers = [
 			\ 'fzf', 'unite', 'better-defaults',
-			\ 'which-key', 'airline',
+			\ 'which-key', 'airline', 'markdown',
 			\ ]
 
 " If you want to have more control over the layer, try using Layer command.
@@ -38,21 +38,21 @@ function! UserInit()
 	Plug 'milkypostman/vim-togglelist'
 	Plug 'yssl/QFEnter'
 	Plug 'jistr/vim-nerdtree-tabs'
-	Plug 'Xuyuanp/nerdtree-git-plugin'
+  Plug 'Xuyuanp/nerdtree-git-plugin'
 	Plug 'airblade/vim-gitgutter'
 	Plug 'jiangmiao/auto-pairs'
 	Plug 'Lokaltog/vim-easymotion'
 	Plug 'flazz/vim-colorschemes'
 	Plug 'lwllvyb/vim-header'
-	Plug 'davidhalter/jedi-vim'
-	Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+  Plug 'Valloric/YouCompleteMe'
+  Plug 'lwllvyb/YCM-Generator'
 	Plug 'w0rp/ale'
 	Plug 'ervandew/supertab'
-	Plug 'sbdchd/neoformat'
-	Plug 'devjoe/vim-codequery'
-	Plug 'Yggdroot/LeaderF'
+	Plug 'Yggdroot/LeaderF', {'do': './install.sh'}
 	Plug 'jremmen/vim-ripgrep'
 	Plug 'skywind3000/asyncrun.vim'
+  Plug 'ludovicchabant/vim-gutentags'
+  Plug 'mhinz/vim-signify'
 endfunction
 
 " Override the default settings as well as adding extras
@@ -71,12 +71,12 @@ function! UserConfig()
 			let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
 		endif
 	endif
-	" vim-rooter
-	let g:rooter_patterns = ['.git/']
-	let g:rooter_resolve_links = 1
-	let g:rooter_silent_chdir = 0
 
-	noremap <leader>ff :Files<cr>
+	" vim-rooter
+	let g:rooter_patterns = ['.git/', '.root/']
+	let g:rooter_resolve_links = 1
+	let g:rooter_silent_chdir = 1
+
 	"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 	" cscope setting
 	"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -111,10 +111,10 @@ function! UserConfig()
 	" nmap <C-_>d :cs find d <C-R>=expand("<cword>")<CR><CR>
 
 	" auto update cscope databases
-	nmap <F2> :!find . -iname '*.c' -o -iname '*.cpp' -o -iname '*.cc' -o -iname '*.h' -o -iname '*.hpp' > cscope.files<CR>
-				\:!cscope -b -i cscope.files -f cscope.out<CR>
-				\:cs add cscope.out<CR>
-				\:cs reset<CR>
+  nmap <F2> :!find . -iname '*.c' -o -iname '*.cpp' -o -iname '*.cc' -o -iname '*.h' -o -iname '*.hpp' > cscope.files<CR>
+        \:!cscope -b -i cscope.files -f cscope.out<CR>
+        \:cs add cscope.out<CR>
+        \:cs reset<CR>
 
 	" nerdcommenter
 	" Add spaces after comment delimiters by default
@@ -170,6 +170,10 @@ function! UserConfig()
 				\ "Unknown"   : "?"
 				\ }
 	" ------------------------------- basic start ------------------------------
+  augroup SmartTab
+    autocmd!
+    autocmd BufNewFile *.py set tabstop=8 softtabstop=0 expandtab shiftwidth=4 smarttab
+  augroup END
 	map <F8> : call SmartTab()<CR>
 	func! SmartTab()
 		echo &filetype
@@ -184,10 +188,12 @@ function! UserConfig()
 			set shiftwidth=4
 		endif
 	endfunc
+
+	" set tabstop=8 softtabstop=0 expandtab shiftwidth=4 smarttab
 	" ------------------------------- basic  end ------------------------------
 
 
-	" 配置状态栏 airline
+"{ 配置状态栏 airline
 	if !exists('g:airline_symbols')
 		let g:airline_symbols = {}
 	endif
@@ -197,15 +203,14 @@ function! UserConfig()
 	let g:airline_right_alt_sep = '❮'
 	let g:airline_symbols.linenr = '¶'
 	let g:airline_symbols.branch = '⎇'
-
-	" 是否打开tabline
-	" let g:airline#extensions#tabline#enabled = 1
+"}
 
 	" 配置主题 colorscheme
 	" colorscheme molokai
 
 	" 快速跳转 easymotion
 	" <leader> <leader> w 触发
+
 	" vim-header
 	let g:header_auto_add_header = 0
 	let g:header_field_author = 'liwenlong'
@@ -213,54 +218,95 @@ function! UserConfig()
 	let g:header_field_modified_timestamp = 0
 	let g:header_field_modified_by = 0
 	let g:header_field_timestamp_format = '%m/%d/%Y'
-	map <leader>ah :AddHeader<CR>
+	map <F4> :AddHeader<CR>
 
-	" sbdchd/neoformat
-	let g:neoformat_enabled_python = ['pep8','yapf']
-	" 默认情况下
-	" Enable alignment
-	let g:neoformat_basic_format_align = 1
-	" Enable tab to spaces conversion
-	let g:neoformat_basic_format_retab = 1
-	" Enable trimmming of trailing whitespace
-	let g:neoformat_basic_format_trim = 1
-	" Run all enabled formatters (by default Neoformat stops after the first formatter succeeds)
-	let g:neoformat_run_all_formatters = 1
-	" When debugging, you can enable either of following variables for extra logging.
-	let g:neoformat_only_msg_on_error = 1
-	" run a formatter on save
-	" augroup fmt
-	"   autocmd!
-	"   autocmd BufWritePre * undojoin | Neoformat
-	" augroup END
-	"
-
-	" jedi-vim
-	let g:jedi#force_py_version = 3
-
-	" w0rp/ale
+"{ w0rp/ale
 	let g:ale_fixers = {
 				\"python":["yapf",],
 				\}
 	let g:ale_sign_error = 'E'
 	let g:ale_sign_warning = 'W'
 	" Set this. Airline will handle the rest.
-	let g:airline#extensions#ale#enabled = 1
 	" Write this in your vimrc file
 	let g:ale_set_loclist = 1
 	let g:ale_set_quickfix = 0
 	let g:ale_open_list = 0
 	let g:ale_keep_list_window_open = 0
+  let g:ale_linters_explicit = 1
+  let g:ale_completion_delay = 500
+  let g:ale_echo_delay = 20
+  let g:ale_lint_delay = 500
+  let g:ale_echo_msg_format = '[%linter%] %code: %%s'
+  let g:ale_lint_on_text_changed = 'normal'
+  let g:ale_lint_on_insert_leave = 1
+  let g:airline#extensions#ale#enabled = 1
 
-	" kywind3000/asyncrun.vim {
+  let g:ale_c_gcc_options = '-Wall -O2 -std=c99'
+  let g:ale_cpp_gcc_options = '-Wall -O2 -std=c++14'
+  let g:ale_c_cppcheck_options = ''
+  let g:ale_cpp_cppcheck_options = ''
+
+  let g:ale_sign_error = "\ue009\ue009"
+  hi! clear SpellBad
+  hi! clear SpellCap
+  hi! clear SpellRare
+  hi! SpellBad gui=undercurl guisp=red
+  hi! SpellCap gui=undercurl guisp=blue
+  hi! SpellRare gui=undercurl guisp=magenta
+"}
+
+" kywind3000/asyncrun.vim {
 	let g:asyncrun_open = 10
 	" }
 	" ripgrep -- asyncrun.vim {
-	" noremap <F3> :AsyncRun! rg --vimgrep --glob '*.{c,cpp,h}' --glob '!{contrib,build,CMakeFiles}' -w <cword> <cr>
+	noremap <F3> :AsyncRun! rg --vimgrep --glob '*.{c,cpp,h}' --glob '!{contrib,build,CMakeFiles}' -w <cword> <cr>
+" }
 
-	noremap <leader>sc :AsyncRun! rg --vimgrep --glob '*.{c,cpp,h}' --glob '!{contrib,build,CMakeFiles}' -w <cword> <cr>
-	noremap <leader>sp :AsyncRun! rg --vimgrep --glob '*.{py}' --glob '!{contrib,build,CMakeFiles}' -w <cword> <cr>
-	noremap <leader>sg :AsyncRun! rg --vimgrep --glob '*.{go}' --glob '!{contrib,build,CMakeFiles}' -w <cword> <cr>
-	" }
+"{
+  set tags=./.tags;,.tags
+  " gutentags 搜索工程目录的标志，碰到这些文件/目录名就停止向上一级目录递归
+  let g:gutentags_project_root = ['.root', '.svn', '.git', '.hg', '.project']
+
+  " 所生成的数据文件的名称
+  let g:gutentags_ctags_tagfile = '.tags'
+
+  " 将自动生成的 tags 文件全部放入 ~/.cache/tags 目录中，避免污染工程目录
+  let s:vim_tags = expand('~/.cache/tags')
+  let g:gutentags_cache_dir = s:vim_tags
+
+  " 配置 ctags 的参数
+  let g:gutentags_ctags_extra_args = ['--fields=+niazS', '--extra=+q']
+  let g:gutentags_ctags_extra_args += ['--c++-kinds=+px']
+  let g:gutentags_ctags_extra_args += ['--c-kinds=+px']
+
+  " 检测 ~/.cache/tags 不存在就新建
+  if !isdirectory(s:vim_tags)
+     silent! call mkdir(s:vim_tags, 'p')
+  endif
+"}
+
+"{ YouCompleterMe
+
+  let g:ycm_add_preview_to_completeopt = 0
+  let g:ycm_show_diagnostics_ui = 0
+  let g:ycm_server_log_level = 'info'
+  let g:ycm_min_num_identifier_candidate_chars = 2
+  let g:ycm_collect_identifiers_from_comments_and_strings = 1
+  let g:ycm_complete_in_strings=1
+  let g:ycm_key_invoke_completion = '<c-z>'
+  let g:ycm_confirm_extra_conf = 0
+  set completeopt=menu,menuone
+
+  noremap <c-z> <NOP>
+
+  let g:ycm_semantic_triggers =  {
+             \ 'c,cpp,python,java,go,erlang,perl': ['re!\w{2}'],
+             \ 'cs,lua,javascript': ['re!\w{2}'],
+             \ }
+  nnoremap <leader>jc :YcmCompleter GoToDeclaration<CR>
+  " 只能是 #include 或已打开的文件
+  nnoremap <leader>jd :YcmCompleter GoToDefinition<CR>
+
+"}
 
 endfunction
